@@ -1,0 +1,43 @@
+name: CI Angular
+on: push
+jobs:
+  test-and-sonar-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Execute Tests
+        run: npm test
+      #- name: Run Lint
+      #  run: npm run lint
+  sast-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "SAST Scan"
+  sca-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Jfrog Xray SCA Scan"
+
+  build:
+    needs: [test-and-sonar-scan,sast-scan,sca-scan]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build app
+        run: npm run build
