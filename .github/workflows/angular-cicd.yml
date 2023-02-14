@@ -8,6 +8,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+        # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -19,6 +22,15 @@ jobs:
       #  run: npm test
       #- name: Run Lint
       #  run: npm run lint
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+        with:
+          projectBaseDir: ./src
+          args: >
+            -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
   sast-scan:
     runs-on: ubuntu-latest
     steps:
