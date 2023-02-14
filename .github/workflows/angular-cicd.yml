@@ -45,7 +45,8 @@ jobs:
         with:
           projectBaseDir: ./src
           args: >
-            -Dsonar.projectKey=${{ needs.prepare.outputs.appName }}
+            -Dsonar.organization=${{ env.SONAR_ORGANIZATION_NAME }}
+            -Dsonar.projectKey=${{ env.SONAR_ORGANIZATION_NAME }}_${{ needs.prepare.outputs.appName }}
             -Dsonar.projectVersion=${{ needs.prepare.outputs.appVersion }}
             -Dsonar.sources=.
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
