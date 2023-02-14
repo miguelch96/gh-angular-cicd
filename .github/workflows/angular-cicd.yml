@@ -21,7 +21,7 @@ jobs:
     needs: prepare
     runs-on: ubuntu-latest
     env:
-      SONAR_ORGANIZATION_NAME: ${{ env.SONAR_ORGANIZATION_NAME }}
+      SONAR_ORGANIZATION_NAME: miguelch96-github
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
