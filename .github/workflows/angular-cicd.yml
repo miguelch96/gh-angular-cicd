@@ -4,7 +4,19 @@ on:
   push:
     branches: ["main","develop"]
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      appName: ${{ steps.getAppInfo.outputs.APP_NAME }}
+      appVersion: ${{ steps.getAppInfo.outputs.APP_VERSION }}
+    steps:
+      - name: Get App Name and Version
+        id: getAppInfo
+        run: |
+          echo "APP_NAME=$(jq --raw-output '.name' ./package.json)" >> $GITHUB_OUTPUT
+          echo "APP_VERSION=$(jq --raw-output '.version' ./package.json)" >> $GITHUB_OUTPUT
   test-and-sonar-scan:
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -31,6 +43,9 @@ jobs:
         with:
           projectBaseDir: ./src
           args: >
+            -Dsonar.projectKey=${{ needs.prepare.outputs.appName }}
+            -Dsonar.projectVersion=${{ needs.prepare.outputs.appVersion }}
+            -Dsonar.sources= .
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
   sast-scan:
     runs-on: ubuntu-latest
