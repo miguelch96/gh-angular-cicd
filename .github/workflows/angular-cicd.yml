@@ -20,6 +20,8 @@ jobs:
   test-and-sonar-scan:
     needs: prepare
     runs-on: ubuntu-latest
+    env:
+      SONAR_ORGANIZATION_NAME: ${{ env.SONAR_ORGANIZATION_NAME }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
