@@ -36,7 +36,7 @@ jobs:
       #- name: Execute Tests
       #  run: npm test
       #- name: Run Lint
-      #  run: npm run lint
+      #  run: npm run lintt
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
