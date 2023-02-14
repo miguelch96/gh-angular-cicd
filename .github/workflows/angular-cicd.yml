@@ -10,6 +10,8 @@ jobs:
       appName: ${{ steps.getAppInfo.outputs.APP_NAME }}
       appVersion: ${{ steps.getAppInfo.outputs.APP_VERSION }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Get App Name and Version
         id: getAppInfo
         run: |
