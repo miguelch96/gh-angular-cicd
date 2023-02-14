@@ -1,6 +1,7 @@
 name: CI Angular
 on:
-  workflow_dispatch:
+  push:
+    branches: ["main","develop"]
 jobs:
   test-and-sonar-scan:
     runs-on: ubuntu-latest
