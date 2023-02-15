@@ -1,12 +1,15 @@
 {
-  "name": "my-first-application",
+  "name": "angular-hello-world",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:dev": "ng build",
+    "build:cert": "ng build",
+    "build:prod": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test --codeCoverage=true --watch=false --browsers=HeadlessChrome"
   },
   "private": true,
   "dependencies": {
