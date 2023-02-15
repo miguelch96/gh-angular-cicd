@@ -54,6 +54,7 @@ jobs:
             -Dsonar.projectVersion=${{ needs.prepare.outputs.appVersion }}
             -Dsonar.sources=.
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.scanner.metadataFilePath=./sonar
       - name: "Find report-task"
         run: |
           ls .scannerwork/
