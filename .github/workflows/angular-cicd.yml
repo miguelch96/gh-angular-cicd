@@ -54,8 +54,11 @@ jobs:
             -Dsonar.projectVersion=${{ needs.prepare.outputs.appVersion }}
             -Dsonar.sources=.
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
-      - name: "Example show SonarQube Quality Gate Status value"
-        run: ls
+      - name: "Find report-task"
+        run: |
+          ls .scannerwork/
+          ls .scannerwork/out
+          ls .scannerwork/out/.sonar
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
         uses: sonarsource/sonarqube-quality-gate-action@master
@@ -63,6 +66,8 @@ jobs:
         env:
          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
       - name: "Example show SonarQube Quality Gate Status value"
         run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
   sast-scan:
