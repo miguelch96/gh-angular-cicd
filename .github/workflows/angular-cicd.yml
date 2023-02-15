@@ -1,0 +1,80 @@
+name: CI Angular
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened]
+  push:
+    branches: ["main","develop"]
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      appName: ${{ steps.getAppInfo.outputs.APP_NAME }}
+      appVersion: ${{ steps.getAppInfo.outputs.APP_VERSION }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Get App Name and Version
+        id: getAppInfo
+        run: |
+          echo "APP_NAME=$(jq --raw-output '.name' ./package.json)" >> $GITHUB_OUTPUT
+          echo "APP_VERSION=$(jq --raw-output '.version' ./package.json)" >> $GITHUB_OUTPUT
+  test-and-sonar-scan:
+    needs: prepare
+    runs-on: ubuntu-latest
+    env:
+      SONAR_ORGANIZATION_NAME: miguelch96-github
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+        # Disabling shallow clone is recommended for improving relevancy of reporting
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      #- name: Execute Tests
+      #  run: npm test
+      #- name: Run Lint
+      #  run: npm run linttt
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          projectBaseDir: ./src
+          args: >
+            -Dsonar.organization=${{ env.SONAR_ORGANIZATION_NAME }}
+            -Dsonar.projectKey=${{ env.SONAR_ORGANIZATION_NAME }}_${{ needs.prepare.outputs.appName }}
+            -Dsonar.projectVersion=${{ needs.prepare.outputs.appVersion }}
+            -Dsonar.sources=.
+            -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
+  sast-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "SAST Scan"
+  sca-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Jfrog Xray SCA Scan"
+
+  build:
+    needs: [test-and-sonar-scan,sast-scan,sca-scan]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build app
+        run: npm run build
